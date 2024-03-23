@@ -1,0 +1,155 @@
+{
+	"info": {
+		"_postman_id": "e4af2aa8-1272-4586-b25d-6b08581aeff2",
+		"name": "Movies",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "33819450"
+	},
+	"item": [
+		{
+			"name": "Popularity",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"categorizeBy\":\"popularity\",\r\n    \"actor\":\"Reese Huxley\",\r\n    \"order\": \"DESC\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3002/movies/all",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3002",
+					"path": [
+						"movies",
+						"all"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "actor",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"categorizeBy\":\"actor\",\r\n    \"actor\":\"Reese Huxley\",\r\n    \"order\": \"DESC\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3002/movies/all",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3002",
+					"path": [
+						"movies",
+						"all"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "similarity",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"categorizeBy\":\"similarity\",\r\n    \"title\":\"Stand-alone web-enabled hub\",\r\n    \"threshold\": \"0.5\",\r\n    \"order\": \"DESC\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3002/movies/all",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3002",
+					"path": [
+						"movies",
+						"all"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "duration",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"categorizeBy\":\"similarity\",\r\n    \"title\":\"Stand-alone web-enabled hub\",\r\n    \"threshold\": \"0.5\",\r\n    \"order\": \"DESC\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3002/movies/all",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3002",
+					"path": [
+						"movies",
+						"all"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "year",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"categorizeBy\":\"similarity\",\r\n    \"title\":\"Stand-alone web-enabled hub\",\r\n    \"threshold\": \"0.5\",\r\n    \"order\": \"DESC\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3002/movies/all",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3002",
+					"path": [
+						"movies",
+						"all"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
