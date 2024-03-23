@@ -41,3 +41,31 @@ export class MoviesBySimilarityResponseDto extends MovieModel {
     @Expose()
     public similarity: number;
 }
+@Exclude()
+export class MoviesByYearResponseDto extends MovieModel {
+    @Expose()
+    public title: string;
+
+    @Expose()
+    public actors: string[];
+
+    @Expose()
+    public genres: string[];
+
+    @Expose()
+    public override year: string;
+}
+@Exclude()
+export class MoviesByDurationResponseDto extends MovieModel {
+    @Expose()
+    public title: string;
+
+    @Expose()
+    public actors: string[];
+
+    @Expose()
+    public genres: string[];
+
+    @Expose()
+    public duration: string;
+}

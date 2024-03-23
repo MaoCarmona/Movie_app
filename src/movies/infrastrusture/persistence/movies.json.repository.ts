@@ -6,7 +6,7 @@ import { IMoviesRepository } from '@app/movies/domain/movies.repository';
 import { findAllQuery } from '@app/movies/domain/interfaces';
 import { JsonDataSource } from '@app/shared/infrastructure/persistence/json/data-source';
 import { plainToInstance } from 'class-transformer';
-import { MoviesByActorResponseDto, MoviesByPopularityResponseDto, MoviesBySimilarityResponseDto } from '@app/movies/domain/dto';
+import { MoviesByActorResponseDto, MoviesByDurationResponseDto, MoviesByPopularityResponseDto, MoviesBySimilarityResponseDto, MoviesByYearResponseDto } from '@app/movies/domain/dto';
 
 @Injectable()
 export class MoviesJsonRepository extends JsonRepository<MovieModel> implements IMoviesRepository {
@@ -142,7 +142,7 @@ export class MoviesJsonRepository extends JsonRepository<MovieModel> implements 
   }
   // End of searching by Similarity
 
-  public async sortByDuration({order}: findAllQuery): Promise<MovieModel[]> {
+  public async sortByDuration({order, page, take}: findAllQuery): Promise<MovieModel[]> {
     const allMovies = await this.getAll();
 
     // Sort movies by duration
@@ -154,22 +154,28 @@ export class MoviesJsonRepository extends JsonRepository<MovieModel> implements 
       }
     });
 
-    return sortedMovies;
+    const startIndex = page * take;
+    const endIndex = startIndex + take;
+
+    return plainToInstance(MoviesByDurationResponseDto,sortedMovies.slice(startIndex, endIndex));
   }
 
-  public async sortByYear({order}: findAllQuery): Promise<MovieModel[]> {
+  public async sortByYear({order, page , take}: findAllQuery): Promise<MovieModel[]> {
     const allMovies = await this.getAll();
 
     // Sort movies by year of release
     const sortedMovies = allMovies.sort((a, b) => {
       if (order === 'ASC') {
-        return a.releaseDate.getFullYear() - b.releaseDate.getFullYear();
+
+        return new Date(a.releaseDate).getFullYear() - new Date(b.releaseDate).getFullYear();
       } else {
-        return b.releaseDate.getFullYear() - a.releaseDate.getFullYear();
+        return new Date(b.releaseDate).getFullYear() - new Date(a.releaseDate).getFullYear();
       }
     });
+    const startIndex = page * take;
+    const endIndex = startIndex + take;
 
-    return sortedMovies;
+    return plainToInstance(MoviesByYearResponseDto,sortedMovies.slice(startIndex, endIndex));
   }
 
   private convertDurationToMinutes(duration: string): number {
