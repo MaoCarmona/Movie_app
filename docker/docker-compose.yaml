@@ -2,5 +2,6 @@ version: '3.9'
 services:
   movie_app:
     build: .
+    image: movie_app
     ports:
-      - "3000:3000"
+      - "3002:3002"
