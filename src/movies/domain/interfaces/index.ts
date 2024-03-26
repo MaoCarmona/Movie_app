@@ -1,1 +1,1 @@
-export * from './movies.query.interface';
+export * from "./movies.query.interface";
