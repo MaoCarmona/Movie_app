@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common';
 import { MovieModel } from '@app/movies/domain/movies.model';
-import { Paginated } from '@app/shared/domain/types';
 import { JsonRepository } from '@app/shared/infrastructure/persistence/json.repository';
 import { IMoviesRepository } from '@app/movies/domain/movies.repository';
 import { findAllQuery } from '@app/movies/domain/interfaces';
