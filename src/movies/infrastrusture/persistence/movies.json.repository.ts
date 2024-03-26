@@ -22,29 +22,21 @@ export class MoviesJsonRepository extends JsonRepository<MovieModel> implements 
     const allMovies = await this.getAll();
     return allMovies.find(movie => movie.title === title) || null;
   }
-  public async findAll(paginated: findAllQuery): Promise<MovieModel[]> {
-    const {categorizeBy} = paginated;
-    switch (categorizeBy){
-      case "popularity":
-        return await this.sortByPopularity(paginated);
-      break
-      case "actor":
-        return await this.findByActor(paginated);
-      break
-      case "similarity":
-        return await this.findSimilarMovies(paginated);
-      break;
-      case "duration":
-        return await this.sortByDuration(paginated);
-      break;
-      case "year":
-        return await this.sortByYear(paginated);
-      break;
-      default:
-        return await this.getAllPaginated(paginated);
+  
+   private categoryFunctions: Record<string, Function> = {
+      "popularity": this.sortByPopularity.bind(this),
+      "actor": this.findByActor.bind(this),
+      "similarity": this.findSimilarMovies.bind(this),
+      "duration": this.sortByDuration.bind(this),
+      "year": this.sortByYear.bind(this),
+      "default": this.getAllPaginated.bind(this)
+  };
 
-    }
-  }
+public async findAll(paginated: findAllQuery): Promise<MovieModel[]> {
+    const {categorizeBy} = paginated;
+    const selectedFunction = this.categoryFunctions[categorizeBy] || this.categoryFunctions['default'];
+    return await selectedFunction(paginated);
+}
   private async getAllPaginated(paginated: findAllQuery): Promise<MovieModel[]> {
     const allMovies = await this.getAll();
     const startIndex = paginated.page * paginated.take;
