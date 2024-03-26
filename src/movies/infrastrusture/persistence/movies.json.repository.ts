@@ -7,6 +7,7 @@ import { findAllQuery } from '@app/movies/domain/interfaces';
 import { JsonDataSource } from '@app/shared/infrastructure/persistence/json/data-source';
 import { plainToInstance } from 'class-transformer';
 import { MoviesByActorResponseDto, MoviesByDurationResponseDto, MoviesByPopularityResponseDto, MoviesBySimilarityResponseDto, MoviesByYearResponseDto } from '@app/movies/domain/dto';
+import { paginatedResponse } from '@app/shared/domain/utils/paginated.utill';
 
 @Injectable()
 export class MoviesJsonRepository extends JsonRepository<MovieModel> implements IMoviesRepository {
@@ -22,7 +23,13 @@ export class MoviesJsonRepository extends JsonRepository<MovieModel> implements 
     const allMovies = await this.getAll();
     return allMovies.find(movie => movie.title === title) || null;
   }
-  
+
+  public async findAll(paginated: findAllQuery): Promise<MovieModel[]> {
+    const {categorizeBy} = paginated;
+    const selectedFunction = this.categoryFunctions[categorizeBy] || this.categoryFunctions['default'];
+    return await selectedFunction(paginated);
+}
+
    private categoryFunctions: Record<string, Function> = {
       "popularity": this.sortByPopularity.bind(this),
       "actor": this.findByActor.bind(this),
@@ -32,24 +39,16 @@ export class MoviesJsonRepository extends JsonRepository<MovieModel> implements 
       "default": this.getAllPaginated.bind(this)
   };
 
-public async findAll(paginated: findAllQuery): Promise<MovieModel[]> {
-    const {categorizeBy} = paginated;
-    const selectedFunction = this.categoryFunctions[categorizeBy] || this.categoryFunctions['default'];
-    return await selectedFunction(paginated);
+private async getAllPaginated(paginated: findAllQuery): Promise<MovieModel[]> {
+    const allMovies = await this.getAll();
+    return paginatedResponse<MovieModel>(allMovies, paginated);
 }
-  private async getAllPaginated(paginated: findAllQuery): Promise<MovieModel[]> {
+
+public async findByActor(paginated: findAllQuery): Promise<MovieModel[]> {
     const allMovies = await this.getAll();
-    const startIndex = paginated.page * paginated.take;
-    const endIndex = startIndex + paginated.take;
-    return allMovies.slice(startIndex, endIndex);
-  }
-  public async findByActor({actor, page,take}: findAllQuery): Promise<MovieModel[]> {
-    const allMovies = await this.getAll();
-    const startIndex = page * take;
-    const endIndex = startIndex + take;
-    const filteredMovies: MovieModel[] = allMovies.filter(movie => movie.actors.includes(actor))
-    return plainToInstance(MoviesByActorResponseDto,filteredMovies.slice(startIndex, endIndex));
-  }
+    const filteredMovies: MovieModel[] = allMovies.filter(movie => movie.actors.includes(paginated.actor));
+    return plainToInstance(MoviesByActorResponseDto, paginatedResponse<MovieModel>(filteredMovies, paginated));
+}
 
   // Sorting By popularity
   private async sortByPopularity(paginated: findAllQuery): Promise<MovieModel[]> {
@@ -66,7 +65,7 @@ public async findAll(paginated: findAllQuery): Promise<MovieModel[]> {
         return popularityB - popularityA;
       }
     });
-    return plainToInstance(MoviesByPopularityResponseDto,sortedMovies);
+    return plainToInstance(MoviesByPopularityResponseDto,paginatedResponse<MovieModel>(sortedMovies,paginated));
   }
   private calculatePopularity(movie: MovieModel): number {
     const ratingWeight = 0.5;
@@ -87,7 +86,8 @@ public async findAll(paginated: findAllQuery): Promise<MovieModel[]> {
   //End Sorting By popularity
 
   //Searching by similarity
-  public async findSimilarMovies({title, threshold, take, page} : findAllQuery): Promise<MovieModel[]> {
+  public async findSimilarMovies(paginated : findAllQuery): Promise<MovieModel[]> {
+    const {title, threshold} = paginated;
     const allMovies: MovieModel[] = await this.getAll();
     const movie: MovieModel = allMovies.find((movie) =>movie.title === title);
     const similarMoviesWithScores = allMovies.map(otherMovie => ({
@@ -101,10 +101,7 @@ public async findAll(paginated: findAllQuery): Promise<MovieModel[]> {
       ...item.movie,
       similarity: item.similarity
   }));
-  
-    const startIndex = page * take;
-    const endIndex = startIndex + take;
-    return plainToInstance(MoviesBySimilarityResponseDto,mappedMovies.slice(startIndex, endIndex));
+    return plainToInstance(MoviesBySimilarityResponseDto,paginatedResponse<MovieModel>(mappedMovies,paginated));
   }
 
   private calculateSimilarityScore(movieA: MovieModel, movieB: MovieModel): number {
@@ -134,9 +131,9 @@ public async findAll(paginated: findAllQuery): Promise<MovieModel[]> {
   }
   // End of searching by Similarity
 
-  public async sortByDuration({order, page, take}: findAllQuery): Promise<MovieModel[]> {
+  public async sortByDuration(paginated: findAllQuery): Promise<MovieModel[]> {
     const allMovies = await this.getAll();
-
+    const {order} = paginated;
     // Sort movies by duration
     const sortedMovies = allMovies.sort((a, b) => {
       if (order === 'ASC') {
@@ -145,16 +142,12 @@ public async findAll(paginated: findAllQuery): Promise<MovieModel[]> {
         return this.convertDurationToMinutes(b.duration) - this.convertDurationToMinutes(a.duration);
       }
     });
-
-    const startIndex = page * take;
-    const endIndex = startIndex + take;
-
-    return plainToInstance(MoviesByDurationResponseDto,sortedMovies.slice(startIndex, endIndex));
+    return plainToInstance(MoviesByDurationResponseDto,paginatedResponse<MovieModel>(sortedMovies, paginated));
   }
 
-  public async sortByYear({order, page , take}: findAllQuery): Promise<MovieModel[]> {
+  public async sortByYear(paginated: findAllQuery): Promise<MovieModel[]> {
     const allMovies = await this.getAll();
-
+    const {order} = paginated;
     // Sort movies by year of release
     const sortedMovies = allMovies.sort((a, b) => {
       if (order === 'ASC') {
@@ -164,10 +157,7 @@ public async findAll(paginated: findAllQuery): Promise<MovieModel[]> {
         return new Date(b.releaseDate).getFullYear() - new Date(a.releaseDate).getFullYear();
       }
     });
-    const startIndex = page * take;
-    const endIndex = startIndex + take;
-
-    return plainToInstance(MoviesByYearResponseDto,sortedMovies.slice(startIndex, endIndex));
+    return plainToInstance(MoviesByYearResponseDto,paginatedResponse<MovieModel>(sortedMovies,paginated));
   }
 
   private convertDurationToMinutes(duration: string): number {
