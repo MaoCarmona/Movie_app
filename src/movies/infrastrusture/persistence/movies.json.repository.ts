@@ -13,6 +13,7 @@ import {
   MoviesByYearResponseDto,
 } from "@app/movies/domain/dto";
 import { paginatedResponse } from "@app/shared/domain/utils/paginated.utill";
+import * as _ from 'lodash';
 
 @Injectable()
 export class MoviesJsonRepository
@@ -64,22 +65,12 @@ export class MoviesJsonRepository
   }
 
   // Sorting By popularity
-  private async sortByPopularity(
+  public async sortByPopularity(
     paginated: findAllQuery
   ): Promise<MovieModel[]> {
     const { order } = paginated;
     const allMovies = await this.getAll();
-    const sortedMovies = allMovies.sort((a, b) => {
-      const popularityA = this.calculatePopularity(a);
-      a.popularity = popularityA;
-      const popularityB = this.calculatePopularity(b);
-      b.popularity = popularityB;
-      if (order === "ASC") {
-        return popularityA - popularityB;
-      } else {
-        return popularityB - popularityA;
-      }
-    });
+    const sortedMovies = _.orderBy(allMovies, movie => movie.popularity =this.calculatePopularity(movie), order.toLowerCase());
     return plainToInstance(
       MoviesByPopularityResponseDto,
       paginatedResponse<MovieModel>(sortedMovies, paginated)
@@ -110,7 +101,7 @@ export class MoviesJsonRepository
   public async findSimilarMovies(
     paginated: findAllQuery
   ): Promise<MovieModel[]> {
-    const { title, threshold } = paginated;
+    const { title, threshold,order } = paginated;
     const allMovies: MovieModel[] = await this.getAll();
     const movie: MovieModel = allMovies.find((movie) => movie.title === title);
     const similarMoviesWithScores = allMovies.map((otherMovie) => ({
@@ -121,14 +112,15 @@ export class MoviesJsonRepository
     const similarMovies = similarMoviesWithScores.filter(
       (item) => item.similarity >= threshold
     );
-    similarMovies.sort((a, b) => b.similarity - a.similarity);
+
     const mappedMovies: MovieModel[] = similarMovies.map((item) => ({
       ...item.movie,
       similarity: item.similarity,
     }));
+    const sortedMovies = _.orderBy(mappedMovies, 'similarity', order.toLowerCase());
     return plainToInstance(
       MoviesBySimilarityResponseDto,
-      paginatedResponse<MovieModel>(mappedMovies, paginated)
+      paginatedResponse<MovieModel>(sortedMovies, paginated)
     );
   }
 
@@ -180,48 +172,26 @@ export class MoviesJsonRepository
   public async sortByDuration(paginated: findAllQuery): Promise<MovieModel[]> {
     const allMovies = await this.getAll();
     const { order } = paginated;
-    // Sort movies by duration
-    const sortedMovies = allMovies.sort((a, b) => {
-      if (order === "ASC") {
-        return (
-          this.convertDurationToMinutes(a.duration) -
-          this.convertDurationToMinutes(b.duration)
-        );
-      } else {
-        return (
-          this.convertDurationToMinutes(b.duration) -
-          this.convertDurationToMinutes(a.duration)
-        );
-      }
-    });
-    return plainToInstance(
-      MoviesByDurationResponseDto,
-      paginatedResponse<MovieModel>(sortedMovies, paginated)
-    );
-  }
+    const sortedMovies = _.orderBy(allMovies, movie => this.convertDurationToMinutes(movie.duration), order.toLowerCase());
 
-  public async sortByYear(paginated: findAllQuery): Promise<MovieModel[]> {
-    const allMovies = await this.getAll();
-    const { order } = paginated;
-    // Sort movies by year of release
-    const sortedMovies = allMovies.sort((a, b) => {
-      if (order === "ASC") {
-        return (
-          new Date(a.releaseDate).getFullYear() -
-          new Date(b.releaseDate).getFullYear()
-        );
-      } else {
-        return (
-          new Date(b.releaseDate).getFullYear() -
-          new Date(a.releaseDate).getFullYear()
-        );
-      }
-    });
     return plainToInstance(
+        MoviesByDurationResponseDto,
+        paginatedResponse<MovieModel>(sortedMovies, paginated)
+    );
+}
+
+public async sortByYear(paginated: findAllQuery): Promise<MovieModel[]> {
+  const allMovies = await this.getAll();
+  const { order } = paginated;
+  const getReleaseYear = (movie: MovieModel) => {
+      return parseInt(movie.year);
+  };
+  const sortedMovies = _.orderBy(allMovies, getReleaseYear, order.toLowerCase());
+  return plainToInstance(
       MoviesByYearResponseDto,
       paginatedResponse<MovieModel>(sortedMovies, paginated)
-    );
-  }
+  );
+}
 
   private convertDurationToMinutes(duration: string): number {
     const durationRegex = /PT(?:(\d+)H)?(?:(\d+)M)?/; // Regular expression to extract hours and minutes
