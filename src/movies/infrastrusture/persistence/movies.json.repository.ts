@@ -143,7 +143,7 @@ export class MoviesJsonRepository extends JsonRepository<MovieModel> implements 
     } else if (attribute === 'releaseDate') {
       return new Date(movie.releaseDate).getFullYear();
     } else {
-      throw new Error(`Atributo no válido: ${attribute}`);
+      throw new Error(`Invalid attribute: ${attribute}`);
     }
   }
 
