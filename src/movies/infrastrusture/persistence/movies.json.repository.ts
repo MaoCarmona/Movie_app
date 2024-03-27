@@ -128,11 +128,11 @@ export class MoviesJsonRepository extends JsonRepository<MovieModel> implements 
     return this.sortByAttribute(paginated, 'releaseDate', MoviesByYearResponseDto);
   }
 
-  private async sortByAttribute(paginated: findAllQuery, attribute: string, T): Promise<MovieModel[]> {
+  private async sortByAttribute(paginated: findAllQuery, attribute: string, DTO): Promise<MovieModel[]> {
     const allMovies = await this.getAll();
     const sortedMovies = _.orderBy(allMovies, movie => this.extractAttributeValue(movie, attribute), paginated.order.toLowerCase());
     return plainToInstance(
-      T,
+      DTO,
       paginatedResponse<MovieModel>(sortedMovies, paginated)
     );
   }
