@@ -31,15 +31,3 @@ export class JsonDataSource<T> {
     }
   }
 }
-
-const jsonFilePath: string = "movies.json";
-const dataSource: JsonDataSource<any> = new JsonDataSource(jsonFilePath);
-
-dataSource
-  .getData()
-  .then((data) => {
-    console.log("Data loaded:", data);
-  })
-  .catch((error) => {
-    console.error("Error:", error);
-  });
