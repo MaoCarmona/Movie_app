@@ -1,7 +1,15 @@
 import { Paginated } from "@app/shared/domain/types";
 import { ApiProperty } from "@nestjs/swagger";
 import { Type, Transform } from "class-transformer";
-import { IsOptional, IsInt, Min, Max, IsString, IsNotEmpty, IsIn } from "class-validator";
+import {
+  IsOptional,
+  IsInt,
+  Min,
+  Max,
+  IsString,
+  IsNotEmpty,
+  IsIn,
+} from "class-validator";
 
 export class PaginatedDto implements Paginated {
   @IsOptional()
@@ -38,7 +46,7 @@ export class PaginatedDto implements Paginated {
     required: false,
     example: "id",
   })
-  @IsIn(["similarity", "popularity", "actor","duration","year"])
+  @IsIn(["similarity", "popularity", "actor", "duration", "year"])
   public categorizeBy?: string;
 
   @IsNotEmpty()

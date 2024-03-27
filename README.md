@@ -3,7 +3,12 @@
 ```bash
 $ yarn install
 $ nest start --watch
+
+## Run Test
+$ yarn test
 ```
+
+
 
 ## You need install Docker Daemon before run followin commands
 #Docker

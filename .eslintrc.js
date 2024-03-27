@@ -69,6 +69,7 @@ module.exports = {
     "no-console": "error",
     "@typescript-eslint/unified-signatures": "off",
     "@typescript-eslint/naming-convention": ["error",
+    "@typescript-eslint/strict-boolean-expressions": ["error", {"allowNullableBoolean": true}],
       {
         selector: 'default',
         format: ['camelCase'],

@@ -1,13 +1,13 @@
-import { JsonDataSource } from "./json/data-source";
+import type { JsonDataSource } from "./json/data-source";
 
 export abstract class JsonRepository<T> {
-  constructor(protected readonly jsonDataSource: JsonDataSource) {}
+  public constructor(protected readonly jsonDataSource: JsonDataSource<T>) {}
 
   protected abstract get entityName(): string;
 
   protected async getAll(): Promise<T[]> {
     const data = await this.jsonDataSource.getData();
-    return data || [];
+    return data;
   }
 
   protected async persist(model: T): Promise<T[]> {
