@@ -9,7 +9,7 @@ describe('MoviesJsonRepository', () => {
 
   // Mock de JsonDataSource
   const jsonDataSourceMock = {
-    getData: jest.fn().mockResolvedValue([]), // Definir la función getData
+    getData: jest.fn().mockResolvedValue([]), 
   };
 
   beforeEach(async () => {
