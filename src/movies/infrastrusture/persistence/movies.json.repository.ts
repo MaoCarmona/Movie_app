@@ -24,6 +24,10 @@ export class MoviesJsonRepository extends JsonRepository<MovieModel> implements 
     super(jsonDataSource);
   }
 
+  private readonly HIGH_WEIGHT = 0.5;
+  private readonly MEDIUM_WEIGHT = 0.3;
+  private readonly LOW_WEIGHT = 0.2;
+
   /**
  * Retrieves all movies with pagination.
  * 
@@ -31,30 +35,10 @@ export class MoviesJsonRepository extends JsonRepository<MovieModel> implements 
  * @returns A promise that resolves to an array of movie objects.
  */
   public async findAll(paginated: findAllQuery): Promise<MovieModel[]> {
-    const { categorizeBy } = paginated;
-    const selectedFunction = this.categoryFunctions[categorizeBy] || this.categoryFunctions["default"];
-    return await selectedFunction(paginated);
-  }
-
-  private readonly categoryFunctions: Record<string, Function> = {
-    popularity: this.sortByPopularity.bind(this),
-    actor: this.findByActor.bind(this),
-    similarity: this.findSimilarMovies.bind(this),
-    duration: this.sortByDuration.bind(this),
-    year: this.sortByYear.bind(this),
-    default: this.getAllPaginated.bind(this),
-  };
-
-  /**
- * Retrieves all movies with pagination.
- * 
- * @param paginated - An object that contains pagination parameters.
- * @returns A promise that resolves to an array of movie objects.
- */
-  private async getAllPaginated(paginated: findAllQuery): Promise<MovieModel[]> {
     const allMovies = await this.getAll();
     return paginatedResponse<MovieModel>(allMovies, paginated);
   }
+
 
   /**
  * Finds a movie by its title.
@@ -103,15 +87,9 @@ export class MoviesJsonRepository extends JsonRepository<MovieModel> implements 
    * @returns The popularity score of the movie.
    */
   private calculatePopularity(movie: MovieModel): number {
-    const ratingWeight = 0.5;
-    const totalRatingsWeight = 0.3;
-    const viewerCountWeight = 0.2;
-
     const averageRating = this.calculateAverageRating(movie.ratings);
-
     const totalRatings = movie.ratings.length;
-    const popularity = averageRating * ratingWeight + totalRatings * totalRatingsWeight + movie.viewerCount * viewerCountWeight;
-
+    const popularity = averageRating * this.HIGH_WEIGHT + totalRatings * this.MEDIUM_WEIGHT + movie.viewerCount * this.LOW_WEIGHT;
     return popularity;
   }
 
@@ -158,16 +136,12 @@ export class MoviesJsonRepository extends JsonRepository<MovieModel> implements 
    * @param movieB - The second movie object.
    * @returns The similarity score between movieA and movieB, ranging from 0 to 1.
    */
-  private calculateSimilarityScore(movieA: MovieModel, movieB: MovieModel): number {
-    const genreWeight = 0.5;
-    const ratingWeight = 0.3;
-    const castWeight = 0.2;
-
+  private calculateSimilarityScore(movieA: MovieModel, movieB: MovieModel): number { 
     const genreScore = this.calculateGenreSimilarity(movieA.genres, movieB.genres);
     const ratingScore = Math.abs(this.calculateAverageRating(movieA.ratings) - this.calculateAverageRating(movieB.ratings));
     const castScore = this.calculateCastSimilarity(movieA.actors, movieB.actors);
 
-    return genreScore * genreWeight + ratingScore * ratingWeight + castScore * castWeight;
+    return genreScore * this.HIGH_WEIGHT + ratingScore * this.MEDIUM_WEIGHT + castScore * this.LOW_WEIGHT;
   }
 
   /**
