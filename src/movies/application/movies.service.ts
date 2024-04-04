@@ -19,4 +19,24 @@ export class MoviesService {
   public async findAll(query: findAllQuery): Promise<MovieModel[]> {
     return this.movieRepository.findAll(query);
   }
+
+  public async findByActor(query: findAllQuery): Promise<MovieModel[]>{
+    return this.movieRepository.findByActor(query);
+  };
+
+  public async findSimilarMovies(query: findAllQuery): Promise<MovieModel[]>{
+    return this.movieRepository.findSimilarMovies(query);
+  };
+
+  public async sortByPopularity(query: findAllQuery): Promise<MovieModel[]>{
+    return this.movieRepository.sortByPopularity(query);
+  };
+
+  public async sortByDuration(query: findAllQuery): Promise<MovieModel[]>{
+    return this.movieRepository.sortByDuration(query);
+  };
+
+  public async sortByYear(query: findAllQuery): Promise<MovieModel[]>{
+    return this.movieRepository.sortByYear(query);
+  };
 }

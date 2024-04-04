@@ -1,6 +1,6 @@
 export interface Paginated {
   take: number;
   page: number;
-  categorizeBy?: string;
+  orderBy?: string;
   order: "ASC" | "DESC";
 }
