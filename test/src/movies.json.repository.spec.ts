@@ -3,6 +3,7 @@ import { JsonDataSource } from '@app/shared/infrastructure/persistence/json/data
 import { findAllQuery } from '@app/movies/domain/interfaces';
 
 import { MoviesJsonRepository } from '../../src/movies/infrastrusture/persistence/movies.json.repository';
+import { MovieModel } from '@app/movies/domain/movies.model';
 
 describe('MoviesJsonRepository', () => {
   let repository: MoviesJsonRepository;
@@ -30,7 +31,6 @@ describe('MoviesJsonRepository', () => {
   describe('findAll', () => {
     it('should return all movies', async () => {
       const paginatedQuery: findAllQuery = {
-        categorizeBy: 'default',
         take: 10,
         page: 0,
         order: 'ASC'
@@ -45,17 +45,25 @@ describe('MoviesJsonRepository', () => {
   describe('findByActor', () => {
     it('should return all movies where actor is in cast', async () => {
       const paginatedQuery: findAllQuery = {
-        categorizeBy: 'actor',
         actor: 'Sam Taylor',
         take: 10,
         page: 0,
         order: 'ASC'
       };
 
-      const result = await repository.findAll(paginatedQuery);
+      const result = await repository.findByActor(paginatedQuery);
 
-      expect(jsonDataSourceMock.getData).toHaveBeenCalled(); 
-      expect(result).toEqual([]);
+      expect(result).toEqual(expect.any(Array));
+      expect(result.length).toBeLessThanOrEqual(paginatedQuery.take);
+      expect(result.every(movie => movie.actors.includes(paginatedQuery.actor))).toBe(true);
+  })});
+  describe('findByTitle', () => {
+    it('should return movie object when title matches', async () => {
+      const title = "Reactive multi-state website";
+  
+      const result = await repository.findByTitle(title);
+  
+      expect(result.title).toEqual(title);
     });
   });
 
