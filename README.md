@@ -9,7 +9,7 @@ The application retrieves all movies with pagination support.
 Endpoint: /movies
 Parameters:
 page: Page number for pagination.
-limit: Number of movies per page.
+take: Number of movies per page.
 orderBy: order by which to order the movies .
 Response: An array of movie objects.
 
@@ -38,7 +38,7 @@ The application sorts movies by their popularity, calculated based on rating, to
 Endpoint: /movies/popularity
 Parameters:
 page: Page number for pagination.
-limit: Number of movies per page.
+take: Number of movies per page.
 order: Sorting order (asc or desc).
 Response: An array of movie objects sorted by popularity.
 ```
@@ -59,7 +59,7 @@ The application sorts movies by their duration.
 Endpoint: /movies/duration
 Parameters:
 page: Page number for pagination.
-limit: Number of movies per page.
+take: Number of movies per page.
 order: Sorting order (asc or desc).
 Response: An array of movie objects sorted by duration.
 ```
@@ -70,7 +70,7 @@ The application sorts movies by their release year.
 Endpoint: /movies/year
 Parameters:
 page: Page number for pagination.
-limit: Number of movies per page.
+take: Number of movies per page.
 order: Sorting order (asc or desc).
 Response: An array of movie objects sorted by release year.
 ```
